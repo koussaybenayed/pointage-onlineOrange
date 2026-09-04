@@ -1,0 +1,41 @@
+<app-auth-shell>
+  <div class="eyebrow">Espace de travail</div>
+  <h1>Rejoins-nous</h1>
+  <p class="subtitle">Cr&eacute;e ton espace pour commencer &agrave; planifier tes jours &agrave; distance.</p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="fullName">Nom complet</label>
+      <input id="fullName" type="text" formControlName="fullName" placeholder="Ex : Amine Ben Salah" autocomplete="name" />
+      <span *ngIf="form.controls.fullName.touched && form.controls.fullName.hasError('required')" class="error">Nom requis.</span>
+      <span *ngIf="form.controls.fullName.touched && form.controls.fullName.hasError('minlength')" class="error">Au moins 3 caract&egrave;res.</span>
+    </div>
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" placeholder="toi@entreprise.com" autocomplete="email" />
+      <span *ngIf="form.controls.email.touched && form.controls.email.hasError('required')" class="error">Email requis.</span>
+      <span *ngIf="form.controls.email.touched && form.controls.email.hasError('email')" class="error">Email invalide.</span>
+    </div>
+    <div class="field">
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" formControlName="password" placeholder="Au moins 6 caract&egrave;res" autocomplete="new-password" />
+      <span *ngIf="form.controls.password.touched && form.controls.password.hasError('required')" class="error">Mot de passe requis.</span>
+      <span *ngIf="form.controls.password.touched && form.controls.password.hasError('minlength')" class="error">Au moins 6 caract&egrave;res.</span>
+    </div>
+    <div class="field">
+      <label for="confirm">Confirmation</label>
+      <input id="confirm" type="password" formControlName="confirm" placeholder="R&eacute;p&egrave;te le mot de passe" autocomplete="new-password" />
+      <span *ngIf="form.touched && form.hasError('mismatch') && form.controls.confirm.value" class="error">Les mots de passe ne correspondent pas.</span>
+    </div>
+
+    <div *ngIf="error" class="error" style="margin-bottom: 14px;">{{ error }}</div>
+
+    <button type="submit" class="btn btn-solid btn-block" [disabled]="loading">
+      {{ loading ? 'Création…' : 'Créer mon compte' }}
+    </button>
+  </form>
+
+  <div class="switch-link">
+    D&eacute;j&agrave; un compte ? <a routerLink="/login">Se connecter</a>
+  </div>
+</app-auth-shell>

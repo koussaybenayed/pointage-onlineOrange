@@ -1,0 +1,120 @@
+.page-head {
+  margin-bottom: 22px;
+}
+.muted {
+  color: var(--color-text-muted);
+  margin: 6px 0 0;
+  font-size: 0.92rem;
+  max-width: 640px;
+}
+
+h3 {
+  margin: 24px 0 12px;
+  font-size: 1.05rem;
+}
+
+.day-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.day-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+  flex-wrap: wrap;
+}
+.day-info {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.day-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-chip {
+  border-radius: 999px;
+  font-weight: 700;
+  font-size: 0.72rem;
+  padding: 4px 12px;
+}
+.status-chip.booked {
+  color: var(--color-success);
+  background: #dcfce7;
+}
+.status-chip.worked {
+  color: #047857;
+  background: #d1fae5;
+}
+.status-chip.missed {
+  color: var(--color-danger);
+  background: #fee2e2;
+}
+
+.btn.small {
+  width: auto;
+  padding: 8px 14px;
+  font-size: 0.82rem;
+}
+
+.note {
+  font-size: 0.82rem;
+  color: var(--color-success);
+  font-weight: 600;
+}
+
+.empty {
+  padding: 30px;
+  text-align: center;
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  border: 1px dashed var(--color-border);
+  border-radius: var(--radius-md);
+}
+
+.report-form {
+  margin-top: 28px;
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 22px;
+  max-width: 640px;
+}
+
+.reports-title {
+  margin-top: 32px;
+}
+
+.report-list {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.report-card {
+  background: var(--color-surface);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  padding: 14px 18px;
+}
+.report-meta {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+.report-card p {
+  margin: 0;
+  color: var(--color-text);
+  line-height: 1.55;
+  white-space: pre-wrap;
+}

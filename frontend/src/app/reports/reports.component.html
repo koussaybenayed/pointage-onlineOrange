@@ -1,0 +1,68 @@
+<div class="page-head">
+  <div>
+    <h2>Mes rapports</h2>
+    <p class="muted">Envoie ton rapport chaque jour de t&eacute;l&eacute;travail avant <strong>18h00 (heure de Tunis)</strong>. Sans rapport &agrave; l'heure, le jour est compt&eacute; comme non travaill&eacute;.</p>
+  </div>
+</div>
+
+<div *ngIf="error" class="alert alert-error">{{ error }}</div>
+<div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+<div *ngIf="loading" class="spinner"></div>
+
+<ng-container *ngIf="!loading">
+  <h3>Jours de la semaine du {{ weekLabel }}</h3>
+
+  <div class="day-list">
+    <div class="day-row" *ngFor="let od of onlineDays">
+      <div class="day-info">
+        <strong>{{ formatDay(od.dayDate) }}</strong>
+        <span class="status-chip" [ngClass]="od.status.toLowerCase()">
+          {{ od.status === 'WORKED' ? 'Travaille' : od.status === 'MISSED' ? 'Manque' : 'Reservé' }}
+        </span>
+      </div>
+
+      <div class="day-actions">
+        <button class="btn btn-primary small" *ngIf="canSubmit(od) && !hasReport(od)" (click)="selectDay(od)"
+                [disabled]="selectedDay !== null && selectedDay.id !== od.id">
+          R&eacute;diger un rapport
+        </button>
+        <span class="note" *ngIf="canSubmit(od) && hasReport(od)">Rapport d&eacute;j&agrave; envoy&eacute; &check;</span>
+        <span class="note muted" *ngIf="!canSubmit(od) && od.status === 'BOOKED'">Rapport ferm&eacute; (18h/00 d&eacute;pass&eacute;e)</span>
+        <span class="note muted" *ngIf="od.status !== 'BOOKED'">Traite</span>
+      </div>
+    </div>
+  </div>
+
+  <div *ngIf="onlineDays.length === 0" class="empty">
+    Aucun jour r&eacute;serv&eacute; cette semaine. Rendez-vous sur le calendrier.
+  </div>
+
+  <!-- Report form for selected day -->
+  <div class="report-form" *ngIf="selectedDay">
+    <h3>Rapport du {{ formatDay(selectedDay.dayDate) }}</h3>
+    <form [formGroup]="form" (ngSubmit)="onSubmit()">
+      <div class="field">
+        <label for="content">Description du travail effectu&eacute;</label>
+        <textarea id="content" formControlName="content" placeholder="D&eacute;cris ce que tu as r&eacute;alis&eacute; durant cette journ&eacute;e de t&eacute;l&eacute;travail..."></textarea>
+        <span *ngIf="form.controls.content.touched && form.controls.content.hasError('required')" class="error">Le rapport est requis.</span>
+        <span *ngIf="form.controls.content.touched && form.controls.content.hasError('minlength')" class="error">Au moins 10 caract&egrave;res.</span>
+      </div>
+
+      <button type="submit" class="btn btn-primary" [disabled]="submitting">
+        {{ submitting ? 'Envoi…' : 'Envoyer le rapport' }}
+      </button>
+    </form>
+  </div>
+
+  <h3 *ngIf="myReports.length > 0" class="reports-title">Rapports envoy&eacute;s</h3>
+  <div class="report-list">
+    <div class="report-card" *ngFor="let r of myReports">
+      <div class="report-meta">
+        <strong>{{ formatDay(r.dayDate) }}</strong>
+        <span class="muted">Re&ccedil;u le {{ r.submittedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <p>{{ r.content }}</p>
+    </div>
+  </div>
+</ng-container>

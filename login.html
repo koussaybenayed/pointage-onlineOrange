@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<title>REMOTA — Connexion</title>
+<style>
+  :root {
+    --bg: #F3EFE7;
+    --text: #1A1A1A;
+    --muted: #6B6B6B;
+    --accent: #111111;
+    --border: #D9D3C7;
+    --white: #FFFFFF;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+  }
+
+  /* Top announcement bar */
+  .announce {
+    background: #111111;
+    color: #fff;
+    text-align: center;
+    font-size: 12px;
+    padding: 8px 16px;
+    letter-spacing: 0.3px;
+  }
+  .announce a { color: #fff; text-decoration: underline; margin-left: 4px; }
+
+  /* Header */
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 20px 48px;
+    background: var(--bg);
+  }
+  .logo {
+    font-weight: 800;
+    font-size: 20px;
+    letter-spacing: 1px;
+  }
+  nav {
+    display: flex;
+    gap: 32px;
+    font-size: 13px;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+  }
+  nav a { color: var(--text); text-decoration: none; }
+  .header-actions { display: flex; gap: 12px; align-items: center; }
+
+  .btn {
+    display: inline-block;
+    border-radius: 999px;
+    padding: 10px 22px;
+    font-size: 13px;
+    font-weight: 600;
+    border: none;
+    cursor: pointer;
+    text-decoration: none;
+    transition: opacity 0.2s ease, transform 0.1s ease;
+  }
+  .btn:hover { opacity: 0.85; }
+  .btn:active { transform: scale(0.98); }
+  .btn-outline {
+    background: transparent;
+    border: 1.5px solid var(--accent);
+    color: var(--accent);
+  }
+  .btn-solid {
+    background: var(--accent);
+    color: #fff;
+  }
+  .btn-block { width: 100%; padding: 16px; font-size: 15px; }
+
+  /* Main layout */
+  main {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    align-items: center;
+    min-height: calc(100vh - 120px);
+    padding: 0 48px;
+    gap: 40px;
+  }
+
+  .form-col { max-width: 420px; }
+  .eyebrow {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 16px;
+  }
+  h1 {
+    font-size: 42px;
+    font-weight: 500;
+    line-height: 1.1;
+    margin-bottom: 12px;
+  }
+  .subtitle {
+    color: var(--muted);
+    font-size: 15px;
+    margin-bottom: 36px;
+  }
+
+  .field { margin-bottom: 20px; }
+  .field label {
+    display: block;
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .field input {
+    width: 100%;
+    padding: 14px 16px;
+    border: 1.5px solid var(--border);
+    border-radius: 10px;
+    background: var(--white);
+    font-size: 15px;
+    color: var(--text);
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .field input:focus { border-color: var(--accent); }
+
+  .switch-link {
+    text-align: center;
+    margin-top: 24px;
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .switch-link a { color: var(--accent); font-weight: 600; text-decoration: underline; }
+
+  /* Visual side */
+  .visual-col {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 100%;
+  }
+  .visual-card {
+    width: 100%;
+    max-width: 520px;
+    aspect-ratio: 4/3;
+    background: linear-gradient(160deg, #1a1a1a 0%, #2e2e2e 100%);
+    border-radius: 24px;
+    position: relative;
+    overflow: hidden;
+    box-shadow: 0 30px 60px -20px rgba(0,0,0,0.35);
+  }
+  .visual-card::before {
+    content: "";
+    position: absolute;
+    top: 32px; left: 32px; right: 32px;
+    height: 14px;
+    background: repeating-linear-gradient(90deg, #444 0 8px, transparent 8px 16px);
+    border-radius: 4px;
+    opacity: 0.5;
+  }
+  .mock-window {
+    position: absolute;
+    top: 70px; left: 32px; right: 32px; bottom: 32px;
+    background: #F3EFE7;
+    border-radius: 12px;
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .mock-row { height: 10px; background: #D9D3C7; border-radius: 6px; }
+  .mock-row.short { width: 40%; }
+  .mock-row.mid { width: 65%; }
+  .mock-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11px;
+    font-weight: 700;
+    color: #1A7A45;
+    margin-top: 8px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; background: #1A7A45; }
+
+  .bottom-links {
+    display: flex;
+    gap: 32px;
+    padding: 24px 48px;
+    font-size: 12px;
+    color: var(--muted);
+  }
+  .bottom-links strong { display: block; color: var(--text); font-size: 13px; margin-top: 2px; }
+
+  @media (max-width: 860px) {
+    main { grid-template-columns: 1fr; padding: 24px; }
+    .visual-col { order: -1; }
+    header { padding: 16px 24px; flex-wrap: wrap; gap: 12px; }
+    nav { display: none; }
+  }
+</style>
+</head>
+<body>
+
+  <div class="announce">Nouveau sur REMOTA ?<a href="#">Découvre la démo</a></div>
+
+  <header>
+    <div class="logo">REMOTA.</div>
+    <nav>
+      <a href="#">Fonctionnalités</a>
+      <a href="#">Équipes</a>
+      <a href="#">Tarifs</a>
+      <a href="#">Intégrations</a>
+    </nav>
+    <div class="header-actions">
+      <a href="#" class="btn btn-outline">Réserver une démo</a>
+      <a href="#" class="btn btn-solid">Essayer gratuitement</a>
+    </div>
+  </header>
+
+  <main>
+    <div class="form-col">
+      <div class="eyebrow">Espace de travail</div>
+      <h1>Reprends le travail</h1>
+      <p class="subtitle">Connecte-toi pour gérer tes jours de télétravail.</p>
+
+      <form>
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" placeholder="toi@entreprise.com">
+        </div>
+        <div class="field">
+          <label for="password">Mot de passe</label>
+          <input id="password" type="password" placeholder="••••••••">
+        </div>
+        <button type="submit" class="btn btn-solid btn-block">Se connecter</button>
+      </form>
+
+      <div class="switch-link">
+        Pas encore de compte ? <a href="#">Crée-en un</a>
+      </div>
+    </div>
+
+    <div class="visual-col">
+      <div class="visual-card">
+        <div class="mock-window">
+          <div class="mock-row short"></div>
+          <div class="mock-row mid"></div>
+          <div class="mock-row"></div>
+          <div class="mock-row short"></div>
+          <div class="mock-badge"><span class="dot"></span> Connecté — statut disponible</div>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <div class="bottom-links">
+    <div>Trouver mon offre<strong>Comparer les plans</strong></div>
+    <div>Support 24/7<strong>Chat en direct</strong></div>
+    <div>Sécurité<strong>Authentification 2FA</strong></div>
+  </div>
+
+</body>
+</html>

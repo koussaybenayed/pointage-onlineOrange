@@ -1,0 +1,29 @@
+<app-auth-shell>
+  <div class="eyebrow">Espace de travail</div>
+  <h1>Reprends le travail</h1>
+  <p class="subtitle">Connecte-toi pour g&eacute;rer tes jours de t&eacute;l&eacute;travail.</p>
+
+  <form [formGroup]="form" (ngSubmit)="onSubmit()">
+    <div class="field">
+      <label for="email">Email</label>
+      <input id="email" type="email" formControlName="email" placeholder="toi@entreprise.com" autocomplete="email" />
+      <span *ngIf="form.controls.email.touched && form.controls.email.hasError('required')" class="error">Email requis.</span>
+      <span *ngIf="form.controls.email.touched && form.controls.email.hasError('email')" class="error">Email invalide.</span>
+    </div>
+    <div class="field">
+      <label for="password">Mot de passe</label>
+      <input id="password" type="password" formControlName="password" placeholder="••••••••" autocomplete="current-password" />
+      <span *ngIf="form.controls.password.touched && form.controls.password.hasError('required')" class="error">Mot de passe requis.</span>
+    </div>
+
+    <div *ngIf="error" class="error" style="margin-bottom: 14px;">{{ error }}</div>
+
+    <button type="submit" class="btn btn-solid btn-block" [disabled]="loading">
+      {{ loading ? 'Connexion…' : 'Se connecter' }}
+    </button>
+  </form>
+
+  <div class="switch-link">
+    Pas encore de compte ? <a routerLink="/register">Cr&eacute;e-en un</a>
+  </div>
+</app-auth-shell>

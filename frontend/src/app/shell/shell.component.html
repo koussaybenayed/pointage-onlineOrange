@@ -1,0 +1,24 @@
+<header class="topbar">
+  <div class="brand-row">
+    <span class="brand-dot"></span>
+    <strong>Pointage</strong>
+  </div>
+
+  <nav class="nav">
+    <a routerLink="/calendar" routerLinkActive="active" *ngIf="!isAdmin">Mon calendrier</a>
+    <a routerLink="/reports" routerLinkActive="active" *ngIf="!isAdmin">Mes rapports</a>
+    <a routerLink="/stats" routerLinkActive="active" *ngIf="!isAdmin">Mes statistiques</a>
+    <a routerLink="/admin" routerLinkActive="active" *ngIf="isAdmin">Tableau de bord</a>
+  </nav>
+
+  <div class="user-row">
+    <span class="user-name">{{ fullName }}</span>
+    <button class="btn-logout" (click)="logout()">D&eacute;connexion</button>
+  </div>
+</header>
+
+<main class="content">
+  <router-outlet></router-outlet>
+</main>
+
+<footer class="copyright">&copy; 2026 &mdash; Tous droits r&eacute;serv&eacute;s &agrave; Koussay Ben Ayed</footer>

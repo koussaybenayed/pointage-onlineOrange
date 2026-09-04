@@ -1,0 +1,47 @@
+<div class="page-head">
+  <div>
+    <h2>Mon calendrier</h2>
+    <p class="muted">Choisis jusqu'&agrave; 2 jours &agrave; distance par semaine. Le vendredi et le week-end sont exclus, ainsi que 2 jours cons&eacute;cutifs.</p>
+  </div>
+  <div class="week-nav">
+    <button class="btn-ghost small" (click)="prevWeek()">&larr;</button>
+    <span class="week-label">Semaine du {{ weekLabel }}</span>
+    <button class="btn-ghost small" (click)="nextWeek()">&rarr;</button>
+  </div>
+</div>
+
+<div *ngIf="error" class="alert alert-error">{{ error }}</div>
+<div *ngIf="success" class="alert alert-success">{{ success }}</div>
+
+<div *ngIf="loading" class="spinner"></div>
+
+<div *ngIf="!loading" class="week-strip">
+  <div class="day-card" *ngFor="let day of days"
+       [class.disabled]="day.isDisabled"
+       [class.today]="day.isToday"
+       [class.booked]="day.booked"
+       [class.worked]="day.booked?.status === 'WORKED'"
+       [class.missed]="day.booked?.status === 'MISSED'">
+    <div class="day-label">{{ day.label }}</div>
+    <div class="day-date">{{ day.date.toLocaleDateString('fr-FR', { day: 'numeric', month: 'short' }) }}</div>
+
+    <div class="day-actions">
+      <ng-container *ngIf="day.booked; else noBook">
+        <span class="status-chip" [ngClass]="day.booked.status.toLowerCase()">
+          {{ day.booked.status === 'WORKED' ? 'Travaillé' : day.booked.status === 'MISSED' ? 'Manqué' : 'Réservé' }}
+        </span>
+        <button *ngIf="day.booked.status === 'BOOKED'" class="btn-ghost small" (click)="cancel(day)" [disabled]="submittingId === day.booked.id">Annuler</button>
+      </ng-container>
+      <ng-template #noBook>
+        <button class="btn btn-primary small" (click)="book(day)"
+                [disabled]="!canBook(day) || submittingId !== null || bookedThisWeek >= 2">
+          {{ day.isDisabled ? day.disabledReason : hasConsecutive(day) ? 'Consécutif' : 'Réserver' }}
+        </button>
+      </ng-template>
+    </div>
+  </div>
+</div>
+
+<div *ngIf="!loading" class="week-summary">
+  <span>{{ bookedThisWeek }} / 2 jours r&eacute;serv&eacute;s cette semaine</span>
+</div>

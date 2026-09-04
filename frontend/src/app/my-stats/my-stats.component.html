@@ -1,0 +1,37 @@
+<div class="page-head">
+  <div>
+    <h2>Mes statistiques</h2>
+    <p class="muted">Le r&eacute;sum&eacute; de tes jours &agrave; distance et de la validation de tes rapports.</p>
+  </div>
+  <div class="week-nav" *ngIf="stats">
+    <button class="btn-ghost small" (click)="previousWeek()">←</button>
+    <span class="week-label">Semaine du {{ stats.weekStart | date:'dd/MM/yyyy' }}</span>
+    <button class="btn-ghost small" (click)="nextWeek()">→</button>
+  </div>
+</div>
+
+<div *ngIf="loading" class="spinner"></div>
+<div *ngIf="error" class="alert alert-error">{{ error }}</div>
+
+<div *ngIf="stats && !loading" class="stats-grid">
+  <div class="stat-card">
+    <div class="stat-icon booked">📅</div>
+    <div class="stat-value">{{ stats.bookedDays }}</div>
+    <div class="stat-label">Jours r&eacute;serv&eacute;s</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon worked">✅</div>
+    <div class="stat-value">{{ stats.workedDays }}</div>
+    <div class="stat-label">Travaill&eacute;s</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-icon missed">⚠️</div>
+    <div class="stat-value">{{ stats.missedDays }}</div>
+    <div class="stat-label">Manqu&eacute;s</div>
+  </div>
+  <div class="stat-card report-card">
+    <div class="stat-value">{{ stats.ratio }}%</div>
+    <div class="stat-label">Rapports &agrave; temps</div>
+    <div class="progress"><div class="progress-fill" [style.width.%]="stats.ratio"></div></div>
+  </div>
+</div>

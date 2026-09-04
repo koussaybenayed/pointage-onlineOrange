@@ -1,0 +1,177 @@
+<div class="page-head">
+  <div>
+    <h2>Tableau de bord</h2>
+    <p class="muted">Statistiques hebdomadaires et rapports de tous les membres &eacute;quipe.</p>
+  </div>
+  <div class="week-nav">
+    <button class="btn-ghost small" (click)="previousWeek()">←</button>
+    <span class="week-label">Semaine du {{ weekLabel }}</span>
+    <button class="btn-ghost small" (click)="nextWeek()">→</button>
+  </div>
+</div>
+
+<div *ngIf="error" class="alert alert-error">{{ error }}</div>
+<div *ngIf="loading" class="spinner"></div>
+
+<ng-container *ngIf="!loading">
+  <div class="tabs">
+    <button class="tab" [class.active]="activeTab === 'stats'" (click)="setTab('stats')">Statistiques</button>
+    <button class="tab" [class.active]="activeTab === 'reports'" (click)="setTab('reports')">Rapports ({{ reports.length }})</button>
+    <button class="tab" [class.active]="activeTab === 'days'" (click)="setTab('days')">Jours r&eacute;serv&eacute;s</button>
+    <button class="tab" [class.active]="activeTab === 'tickets'" (click)="setTab('tickets')">Tickets</button>
+  </div>
+
+  <!-- Stats table -->
+  <div *ngIf="activeTab === 'stats'" class="table-wrap">
+    <table class="table">
+      <thead>
+        <tr>
+          <th>Membre</th>
+          <th>Jours r&eacute;serv&eacute;s</th>
+          <th>Travaill&eacute;s</th>
+          <th>Manqu&eacute;s</th>
+          <th>Pr&eacute;sence</th>
+          <th>Rendement</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let s of stats">
+          <td class="user-cell">{{ s.userName }}</td>
+          <td>{{ s.bookedDays }}</td>
+          <td class="ok">{{ s.workedDays }}</td>
+          <td class="bad">{{ s.missedDays }}</td>
+          <td>
+            <div class="ratio-cell">
+              <span>{{ s.ratio }}%</span>
+              <div class="mini-progress"><div class="mini-fill" [style.width.%]="s.ratio"></div></div>
+            </div>
+          </td>
+          <td>
+            <div class="ratio-cell">
+              <span>{{ s.rendement }}</span>
+              <span class="muted small">tickets/jour</span>
+            </div>
+          </td>
+        </tr>
+        <tr *ngIf="stats.length === 0">
+          <td colspan="6" class="empty-cell">Aucune donn&eacute;e cette semaine.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Reports list -->
+  <div *ngIf="activeTab === 'reports'" class="report-list">
+    <div class="report-card" *ngFor="let r of reports">
+      <div class="report-meta">
+        <strong>{{ r.userName }}</strong>
+        <span class="muted">{{ formatDay(r.dayDate) }} &middot; re&ccedil;u le {{ r.submittedAt | date:'dd/MM/yyyy HH:mm' }}</span>
+      </div>
+      <p>{{ r.content }}</p>
+    </div>
+    <div *ngIf="reports.length === 0" class="empty-cell">Aucun rapport soumis cette semaine.</div>
+  </div>
+
+  <!-- Reserved days per user -->
+  <div *ngIf="activeTab === 'days'">
+    <div class="day-row" *ngFor="let g of dayGroups">
+      <div class="day-row-name">
+        <strong>{{ g.userName }}</strong>
+        <span class="muted">{{ g.days.length }} jour(s) r&eacute;serv&eacute;(s)</span>
+      </div>
+      <div class="day-chips">
+        <span class="day-chip" [ngClass]="'status-' + d.status" *ngFor="let d of g.days">
+          {{ formatDay(d.dayDate) }}
+        </span>
+      </div>
+    </div>
+    <div *ngIf="dayGroups.length === 0" class="empty-cell">Personne n'a r&eacute;serv&eacute; de jour cette semaine.</div>
+  </div>
+
+  <!-- Tickets report -->
+  <div *ngIf="activeTab === 'tickets'">
+    <div class="team-selector">
+      <button class="tab small-tab" [class.active]="ticketTeam === 'B2B'" (click)="setTicketTeam('B2B')">Equipe B2B</button>
+      <button class="tab small-tab" [class.active]="ticketTeam === 'GP'" (click)="setTicketTeam('GP')">Equipe GP</button>
+      <button class="tab small-tab upload-toggle" (click)="uploadOpen = !uploadOpen">
+        {{ uploadOpen ? 'Fermer' : 'Téléverser un fichier' }}
+      </button>
+    </div>
+
+    <div *ngIf="uploadOpen" class="upload-panel">
+      <div class="upload-field">
+        <label class="upload-label">Type de rapport</label>
+        <select class="field select" [(ngModel)]="uploadReportType">
+          <option [ngValue]="'SMC_BO'">Rapport_SMC_BO (B2B)</option>
+          <option [ngValue]="'ATP_WO'">Rapport ATP_WO (B2B)</option>
+          <option [ngValue]="'TDB_SMC_BO'">TDBRapport_SMC_BO (GP)</option>
+        </select>
+      </div>
+      <div class="upload-field">
+        <label class="upload-label">Fichier .xlsx</label>
+        <input type="file" accept=".xlsx" class="field file-input" (change)="onFileSelected($event)" />
+      </div>
+      <div *ngIf="selectedFile" class="selected-file">Fichier s&eacute;lectionn&eacute; : <strong>{{ selectedFile.name }}</strong></div>
+      <div *ngIf="uploadErr" class="alert alert-error">{{ uploadErr }}</div>
+      <div *ngIf="uploadMsg" class="alert alert-success">{{ uploadMsg }}</div>
+      <button class="btn btn-primary" (click)="uploadFile()" [disabled]="uploading || !selectedFile">
+        {{ uploading ? 'T&eacute;l&eacute;versement...' : 'T&eacute;l&eacute;verser' }}
+      </button>
+    </div>
+
+    <div *ngIf="ticketLoading" class="spinner"></div>
+
+    <div *ngIf="!ticketLoading">
+      <!-- Alerts -->
+      <div *ngIf="ticketAlerts.length > 0" class="alerts-section">
+        <h3 class="alerts-title">Alertes ({{ ticketAlerts.length }})</h3>
+        <div class="alert-card" *ngFor="let a of ticketAlerts" [ngClass]="a.type === 'LATE_START' ? 'alert-late' : 'alert-gap'">
+          <div class="alert-icon">{{ a.type === 'LATE_START' ? '&#9200;' : '&#9203;' }}</div>
+          <div class="alert-body">
+            <div class="alert-header">
+              <strong>{{ a.userName }}</strong>
+              <span class="alert-badge" [ngClass]="a.type === 'LATE_START' ? 'badge-late' : 'badge-gap'">
+                {{ a.type === 'LATE_START' ? 'Retard' : 'Pause longue' }}
+              </span>
+            </div>
+            <p class="alert-msg">{{ a.message }}</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="table-wrap" *ngIf="ticketStats.length > 0">
+        <table class="table">
+          <thead>
+            <tr>
+              <th>Membre</th>
+              <th>Tickets r&eacute;solus</th>
+              <th></th>
+            </tr>
+          </thead>
+          <tbody>
+            <ng-container *ngFor="let u of ticketStats">
+              <tr class="clickable-row" (click)="toggleUser(u.userName)">
+                <td class="user-cell">{{ u.userName }}</td>
+                <td class="ok">{{ u.totalTickets }}</td>
+                <td class="expand-cell">{{ isUserExpanded(u.userName) ? '&#9660;' : '&#9654;' }}</td>
+              </tr>
+              <tr *ngIf="isUserExpanded(u.userName)" class="detail-row">
+                <td colspan="3">
+                  <div class="ticket-detail-list">
+                    <div class="ticket-detail-item" *ngFor="let t of u.tickets">
+                      <span class="ticket-num">{{ t.ticketNumber }}</span>
+                      <span class="ticket-datetime" *ngIf="t.createdDateTime">{{ formatDateTime(t.createdDateTime) }}</span>
+                      <span class="ticket-datetime" *ngIf="t.resolutionDateTime">{{ formatDateTime(t.resolutionDateTime) }}</span>
+                      <span class="ticket-source muted">{{ t.source }}</span>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+            </ng-container>
+          </tbody>
+        </table>
+      </div>
+      <div *ngIf="ticketStats.length === 0 && ticketAlerts.length === 0" class="empty-cell">Aucun ticket r&eacute;solu cette semaine pour l'&eacute;quipe {{ ticketTeam }}.</div>
+    </div>
+  </div>
+</ng-container>
