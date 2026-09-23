@@ -5,7 +5,7 @@ import { UserWeekStats } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class StatsService {
-  private readonly API = 'http://localhost:8085/api/stats';
+  private readonly API = '/api/stats';
 
   constructor(private http: HttpClient) {}
 

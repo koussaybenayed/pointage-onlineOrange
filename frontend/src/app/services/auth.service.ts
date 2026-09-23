@@ -10,7 +10,7 @@ const USER_KEY = 'current_user';
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
-  private readonly API = 'http://localhost:8085/api/auth';
+  private readonly API = '/api/auth';
   private currentUser = new BehaviorSubject<AuthResponse | null>(this.loadUser());
 
   user$ = this.currentUser.asObservable();

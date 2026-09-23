@@ -5,7 +5,7 @@ import { OnlineDayAdmin, Report, UserWeekStats, TicketReportResponse, TicketEvol
 
 @Injectable({ providedIn: 'root' })
 export class AdminService {
-  private readonly API = 'http://localhost:8085/api/admin';
+  private readonly API = '/api/admin';
 
   constructor(private http: HttpClient) {}
 

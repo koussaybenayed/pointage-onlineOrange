@@ -5,7 +5,7 @@ import { OnlineDay } from '../models/models';
 
 @Injectable({ providedIn: 'root' })
 export class OnlineDayService {
-  private readonly API = 'http://localhost:8085/api/online-days';
+  private readonly API = '/api/online-days';
 
   constructor(private http: HttpClient) {}
 
