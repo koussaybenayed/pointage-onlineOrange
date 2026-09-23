@@ -6,7 +6,6 @@
 
   <nav class="nav">
     <a routerLink="/calendar" routerLinkActive="active" *ngIf="!isAdmin">Mon calendrier</a>
-    <a routerLink="/reports" routerLinkActive="active" *ngIf="!isAdmin">Mes rapports</a>
     <a routerLink="/stats" routerLinkActive="active" *ngIf="!isAdmin">Mes statistiques</a>
     <a routerLink="/admin" routerLinkActive="active" *ngIf="isAdmin">Tableau de bord</a>
   </nav>

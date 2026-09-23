@@ -34,4 +34,55 @@ public class AdminTicketReportController {
 
         return ticketReportService.getTicketReport(team, start, end);
     }
+
+    @GetMapping("/ticket-evolution")
+    public TicketEvolutionDto getTicketEvolution(
+            @RequestParam String team,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+
+        if (start == null) {
+            LocalDate now = LocalDate.now();
+            start = now.with(java.time.DayOfWeek.MONDAY);
+        }
+        if (end == null) {
+            end = start.plusDays(6);
+        }
+
+        return ticketReportService.getTicketEvolution(team, start, end);
+    }
+
+    @GetMapping("/ticket-acquittement-evolution")
+    public TicketEvolutionDto getTicketAcquittementEvolution(
+            @RequestParam String team,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+
+        if (start == null) {
+            LocalDate now = LocalDate.now();
+            start = now.with(java.time.DayOfWeek.MONDAY);
+        }
+        if (end == null) {
+            end = start.plusDays(6);
+        }
+
+        return ticketReportService.getTicketAcquittementEvolution(team, start, end);
+    }
+
+    @GetMapping("/ticket-created-evolution")
+    public TicketEvolutionDto getTicketCreatedEvolution(
+            @RequestParam String team,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start,
+            @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate end) {
+
+        if (start == null) {
+            LocalDate now = LocalDate.now();
+            start = now.with(java.time.DayOfWeek.MONDAY);
+        }
+        if (end == null) {
+            end = start.plusDays(6);
+        }
+
+        return ticketReportService.getTicketCreatedEvolution(team, start, end);
+    }
 }

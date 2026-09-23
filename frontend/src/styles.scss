@@ -164,6 +164,11 @@ h1, h2, h3, h4 {
   color: var(--color-success);
   border-color: #bbf7d0;
 }
+.alert-info {
+  background: #eff6ff;
+  color: var(--color-accent);
+  border-color: #bfdbfe;
+}
 
 /* Spinner */
 .spinner {

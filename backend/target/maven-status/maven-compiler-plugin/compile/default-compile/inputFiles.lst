@@ -2,6 +2,7 @@ C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\ticketreport\TicketReportService.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\auth\LoginRequest.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\config\JwtAuthFilter.java
+C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\ticketreport\TicketEvolutionDto.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\report\AdminReportController.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\config\ApiExceptionHandler.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\onlineday\OnlineDay.java
@@ -13,6 +14,7 @@ C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\user\UserRepository.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\auth\JwtUtil.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\onlineday\OnlineDayRepository.java
+C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\user\OfficialTeam.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\ticketreport\TicketAlert.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\config\SecurityConfig.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\scheduler\ReportDeadlineScheduler.java
@@ -20,6 +22,7 @@ C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\config\OnlineDaySeeder.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\ticketreport\AdminTicketReportController.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\onlineday\OnlineDayService.java
+C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\plainte\PlainteDtos.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\PointageApplication.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\report\ReportRequest.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\onlineday\AdminOnlineDayController.java
@@ -29,6 +32,7 @@ C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\report\ReportController.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\stats\UserWeekStats.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\auth\RegisterRequest.java
+C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\plainte\PlainteController.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\ticketreport\TicketDto.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\stats\StatsController.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\auth\RefreshRequest.java
@@ -36,6 +40,7 @@ C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\stats\StatsService.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\ticketreport\ExcelUploadController.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\auth\AuthService.java
+C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\plainte\PlainteService.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\report\ReportRepository.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\report\ReportService.java
 C:\Users\MediaHelp\Downloads\stage orange\pointage online days\backend\src\main\java\com\pointage\auth\AuthController.java

@@ -36,7 +36,7 @@ public class DataSeeder implements CommandLineRunner {
         List<UserData> users = List.of(
                 new UserData("Afef Ayari", "afef.ayari@pointage.tn", User.Team.B2B),
                 new UserData("Lobna Hammami", "lobna.hammami@pointage.tn", User.Team.B2B),
-                new UserData("Nabil Dhouir", "nabil.dhouir@pointage.tn", User.Team.B2B),
+                new UserData("Nabil Thouri", "nabil.dhouir@pointage.tn", User.Team.B2B),
                 new UserData("Med Ali Essifi", "medali.essifi@pointage.tn", User.Team.B2B),
                 new UserData("Mohamed Ferjene", "mohamed.ferjene@pointage.tn", User.Team.B2B),
                 new UserData("Fatma Mejri", "fatma.mejri@pointage.tn", User.Team.B2B),

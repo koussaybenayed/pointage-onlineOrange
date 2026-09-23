@@ -8,6 +8,11 @@ public record TicketDto(
         String createdDateTime,
         String resolutionDateTime,
         String followUpDate,
-        String source
+        String source,
+        String acquittementDate,
+        String acquittementUser,
+        String createdUser,
+        String typeProduit,
+        String acquittementDateTime
 ) {
 }

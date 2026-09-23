@@ -25,7 +25,7 @@ public class ReportDeadlineScheduler {
     // Runs every day at 18:05 Africa/Tunis (a small buffer after the 18:00 deadline)
     // The JVM is configured with the Africa/Tunis zone via spring.jackson.time-zone,
     // but a robust deploy sets server.time-zone too or runs the JVM with that TZ.
-    @Scheduled(cron = "0 5 18 * * *", zone = "Africa/Tunis")
+    // @Scheduled(cron = "0 5 18 * * *", zone = "Africa/Tunis")
     @Transactional
     public void markMissedReports() {
         LocalDate today = LocalDate.now();

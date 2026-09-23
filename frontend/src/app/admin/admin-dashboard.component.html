@@ -1,14 +1,22 @@
 <div class="page-head">
   <div>
     <h2>Tableau de bord</h2>
-    <p class="muted">Statistiques hebdomadaires et rapports de tous les membres &eacute;quipe.</p>
+    <p class="muted">Statistiques mensuelles, rendement (courbes) et réservations des jours online.</p>
   </div>
-  <div class="week-nav">
-    <button class="btn-ghost small" (click)="previousWeek()">←</button>
-    <span class="week-label">Semaine du {{ weekLabel }}</span>
-    <button class="btn-ghost small" (click)="nextWeek()">→</button>
+  <div class="page-head-actions">
+    <div class="week-nav">
+      <button class="btn-ghost small" (click)="previousMonth()">←</button>
+      <span class="week-label">Mois de {{ monthLabel }}</span>
+      <button class="btn-ghost small" (click)="nextMonth()">→</button>
+    </div>
+    <button class="btn btn-primary small" (click)="exportDashboardPptx()" [disabled]="exportingPptx">
+      {{ exportingPptx ? 'Exportation...' : 'Exporter PPTX' }}
+    </button>
   </div>
 </div>
+
+<div *ngIf="exportErr" class="alert alert-error">{{ exportErr }}</div>
+<div *ngIf="exportingPptx" class="alert alert-info">Exportation PPTX en cours...</div>
 
 <div *ngIf="error" class="alert alert-error">{{ error }}</div>
 <div *ngIf="loading" class="spinner"></div>
@@ -16,9 +24,9 @@
 <ng-container *ngIf="!loading">
   <div class="tabs">
     <button class="tab" [class.active]="activeTab === 'stats'" (click)="setTab('stats')">Statistiques</button>
-    <button class="tab" [class.active]="activeTab === 'reports'" (click)="setTab('reports')">Rapports ({{ reports.length }})</button>
     <button class="tab" [class.active]="activeTab === 'days'" (click)="setTab('days')">Jours r&eacute;serv&eacute;s</button>
-    <button class="tab" [class.active]="activeTab === 'tickets'" (click)="setTab('tickets')">Tickets</button>
+    <button class="tab" [class.active]="activeTab === 'tickets'" (click)="setTab('tickets')">Rendement &amp; tickets</button>
+    <button class="tab" [class.active]="activeTab === 'plaintes'" (click)="setTab('plaintes')">Plaintes</button>
   </div>
 
   <!-- Stats table -->
@@ -29,7 +37,7 @@
           <th>Membre</th>
           <th>Jours r&eacute;serv&eacute;s</th>
           <th>Travaill&eacute;s</th>
-          <th>Manqu&eacute;s</th>
+          <th>Absents</th>
           <th>Pr&eacute;sence</th>
           <th>Rendement</th>
         </tr>
@@ -54,41 +62,47 @@
           </td>
         </tr>
         <tr *ngIf="stats.length === 0">
-          <td colspan="6" class="empty-cell">Aucune donn&eacute;e cette semaine.</td>
+          <td colspan="6" class="empty-cell">Aucune donnée ce mois.</td>
         </tr>
       </tbody>
     </table>
   </div>
 
-  <!-- Reports list -->
-  <div *ngIf="activeTab === 'reports'" class="report-list">
-    <div class="report-card" *ngFor="let r of reports">
-      <div class="report-meta">
-        <strong>{{ r.userName }}</strong>
-        <span class="muted">{{ formatDay(r.dayDate) }} &middot; re&ccedil;u le {{ r.submittedAt | date:'dd/MM/yyyy HH:mm' }}</span>
-      </div>
-      <p>{{ r.content }}</p>
-    </div>
-    <div *ngIf="reports.length === 0" class="empty-cell">Aucun rapport soumis cette semaine.</div>
-  </div>
-
-  <!-- Reserved days per user -->
+  <!-- Reserved days -->
   <div *ngIf="activeTab === 'days'">
+    <!-- Admin reservation form -->
+    <div class="booking-panel">
+      <h3 class="alerts-title">R&eacute;server un jour online pour un membre</h3>
+      <div class="booking-row">
+        <select class="field select" [(ngModel)]="selectedMemberId" (change)="onMemberSelect()">
+          <option [ngValue]="null">Choisir un membre...</option>
+          <option *ngFor="let m of members; let i = index" [ngValue]="i + 1">{{ m.fullName }}</option>
+        </select>
+        <input type="date" class="field select" [(ngModel)]="bookingDate" [min]="todayIso" />
+        <button class="btn btn-primary" (click)="adminBook()">R&eacute;server</button>
+      </div>
+      <div *ngIf="bookingMsg" class="alert alert-success">{{ bookingMsg }}</div>
+      <div *ngIf="bookingErr" class="alert alert-error">{{ bookingErr }}</div>
+      <p class="muted small">Vendredi et week-end exclus. Max 2 jours online par semaine, non consécutifs.</p>
+    </div>
+
     <div class="day-row" *ngFor="let g of dayGroups">
       <div class="day-row-name">
         <strong>{{ g.userName }}</strong>
         <span class="muted">{{ g.days.length }} jour(s) r&eacute;serv&eacute;(s)</span>
       </div>
       <div class="day-chips">
-        <span class="day-chip" [ngClass]="'status-' + d.status" *ngFor="let d of g.days">
+        <span class="day-chip week-chip" [ngClass]="'status-' + d.status" *ngFor="let d of g.days">
           {{ formatDay(d.dayDate) }}
+          <span class="chip-status">{{ d.status === 'WORKED' ? 'travaillé' : (d.status === 'MISSED' ? 'absent' : 'réservé') }}</span>
         </span>
+        <span class="day-chip" *ngIf="g.days.length === 0">Aucune r&eacute;servation</span>
       </div>
     </div>
-    <div *ngIf="dayGroups.length === 0" class="empty-cell">Personne n'a r&eacute;serv&eacute; de jour cette semaine.</div>
+    <div *ngIf="dayGroups.length === 0" class="empty-cell">Personne n'a r&eacute;serv&eacute; de jour ce mois.</div>
   </div>
 
-  <!-- Tickets report -->
+  <!-- Rendement & tickets -->
   <div *ngIf="activeTab === 'tickets'">
     <div class="team-selector">
       <button class="tab small-tab" [class.active]="ticketTeam === 'B2B'" (click)="setTicketTeam('B2B')">Equipe B2B</button>
@@ -100,29 +114,104 @@
 
     <div *ngIf="uploadOpen" class="upload-panel">
       <div class="upload-field">
-        <label class="upload-label">Type de rapport</label>
-        <select class="field select" [(ngModel)]="uploadReportType">
-          <option [ngValue]="'SMC_BO'">Rapport_SMC_BO (B2B)</option>
-          <option [ngValue]="'ATP_WO'">Rapport ATP_WO (B2B)</option>
-          <option [ngValue]="'TDB_SMC_BO'">TDBRapport_SMC_BO (GP)</option>
-        </select>
+        <label class="upload-label">Fichier(s) .xlsx</label>
+        <input type="file" accept=".xlsx" multiple class="field file-input" (change)="onFileSelected($event)" />
+        <p class="muted small" *ngIf="ticketTeam === 'B2B'">B2B : sélectionnez Rapport_SMC_BO <strong>et</strong> Rapport ATP en même temps (Ctrl/Shift + clic).</p>
+        <p class="muted small" *ngIf="ticketTeam === 'GP'">GP : sélectionnez TDBRapport_SMC_BO.</p>
       </div>
-      <div class="upload-field">
-        <label class="upload-label">Fichier .xlsx</label>
-        <input type="file" accept=".xlsx" class="field file-input" (change)="onFileSelected($event)" />
+      <div *ngIf="selectedFiles.length" class="selected-file">
+        <div class="upload-field">
+          <strong>Fichiers sélectionnés ({{ selectedFiles.length }}) :</strong>
+          <span *ngFor="let f of selectedFiles" class="upload-name">{{ f.name }}</span>
+        </div>
       </div>
-      <div *ngIf="selectedFile" class="selected-file">Fichier s&eacute;lectionn&eacute; : <strong>{{ selectedFile.name }}</strong></div>
       <div *ngIf="uploadErr" class="alert alert-error">{{ uploadErr }}</div>
       <div *ngIf="uploadMsg" class="alert alert-success">{{ uploadMsg }}</div>
-      <button class="btn btn-primary" (click)="uploadFile()" [disabled]="uploading || !selectedFile">
+      <button class="btn btn-primary" (click)="uploadFile()" [disabled]="uploading || selectedFiles.length === 0">
         {{ uploading ? 'T&eacute;l&eacute;versement...' : 'T&eacute;l&eacute;verser' }}
       </button>
     </div>
 
+    <div *ngIf="evolutionLoading" class="spinner"></div>
+
+    <!-- Evolution curves -->
+    <div *ngIf="!evolutionLoading && ticketTeam === 'B2B' && allTicketsChartData.datasets.length" class="charts-section">
+      <div class="chart-card">
+        <h3 class="alerts-title">Tous les tickets &mdash; cr&eacute;&eacute;s par jour et par membre (Equipe {{ ticketTeam }})</h3>
+        <div class="chart-box tall">
+          <canvas *ngIf="allTicketsChartData.datasets.length" baseChart
+                  [type]="'line'" [data]="allTicketsChartData" [options]="allTicketsChartOptions"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="alerts-title">Tickets SMC_BO &mdash; cr&eacute;&eacute;s par jour et par membre (Equipe {{ ticketTeam }})</h3>
+        <div class="chart-box tall">
+          <canvas *ngIf="smcboChartData.datasets.length" baseChart
+                  [type]="'line'" [data]="smcboChartData" [options]="smcboChartOptions"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="alerts-title">Tickets ATP_WO &mdash; cr&eacute;&eacute;s par jour et par membre (Equipe {{ ticketTeam }})</h3>
+        <div class="chart-box tall">
+          <canvas *ngIf="atpChartData.datasets.length" baseChart
+                  [type]="'line'" [data]="atpChartData" [options]="atpChartOptions"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="!evolutionLoading && ticketTeam === 'GP' && masseChartData.datasets.length" class="charts-section">
+      <div class="chart-card">
+        <h3 class="alerts-title">Rendement en masse &mdash; tickets r&eacute;solus par jour (Equipe {{ ticketTeam }})</h3>
+        <div class="chart-box">
+          <canvas *ngIf="masseChartData.datasets.length" baseChart
+                  [type]="'line'" [data]="masseChartData" [options]="masseChartOptions"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="alerts-title">Rendement unitaire &mdash; tickets par jour et par membre</h3>
+        <div class="chart-box tall">
+          <canvas *ngIf="unitaireChartData.datasets.length" baseChart
+                  [type]="'line'" [data]="unitaireChartData" [options]="unitaireChartOptions"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="alerts-title">Tickets SMC_BO vs Workflow ATP</h3>
+        <div class="chart-box">
+          <canvas *ngIf="sourceChartData.datasets.length" baseChart
+                  [type]="'line'" [data]="sourceChartData" [options]="sourceChartOptions"></canvas>
+        </div>
+      </div>
+
+      <div class="chart-card">
+        <h3 class="alerts-title">Rendement acquittement &mdash; tickets par jour et par utilisateur acq.
+          <span *ngIf="typeProduitFilter !== 'ALL'">({{ typeProduitFilter }})</span>
+          (Equipe {{ ticketTeam }})</h3>
+        <div class="source-filter" *ngIf="typeProduitOptions.length">
+          <button class="tab small-tab" [class.active]="typeProduitFilter === 'ALL'" (click)="setTypeProduitFilter('ALL')">Tous</button>
+          <button *ngFor="let t of typeProduitOptions" class="tab small-tab" [class.active]="typeProduitFilter === t" (click)="setTypeProduitFilter(t)">{{ t }}</button>
+        </div>
+        <div class="chart-box tall">
+          <canvas *ngIf="acquittementChartData.datasets.length" baseChart
+                  [type]="'line'" [data]="acquittementChartData" [options]="acquittementChartOptions"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Ticket detail -->
     <div *ngIf="ticketLoading" class="spinner"></div>
 
     <div *ngIf="!ticketLoading">
-      <!-- Alerts -->
+      <div class="source-filter">
+        <button class="tab small-tab" [class.active]="sourceFilter === 'ALL'" (click)="setSourceFilter('ALL')">Tous</button>
+        <button class="tab small-tab" [class.active]="sourceFilter === 'SMC_BO'" (click)="setSourceFilter('SMC_BO')">Tickets SMC_BO</button>
+        <button class="tab small-tab" [class.active]="sourceFilter === 'ATP'" (click)="setSourceFilter('ATP')">Workflow ATP</button>
+        <button class="tab small-tab" [class.active]="sourceFilter === 'GP'" (click)="setSourceFilter('GP')">GP (TDB_SMC_BO)</button>
+      </div>
+
       <div *ngIf="ticketAlerts.length > 0" class="alerts-section">
         <h3 class="alerts-title">Alertes ({{ ticketAlerts.length }})</h3>
         <div class="alert-card" *ngFor="let a of ticketAlerts" [ngClass]="a.type === 'LATE_START' ? 'alert-late' : 'alert-gap'">
@@ -139,7 +228,7 @@
         </div>
       </div>
 
-      <div class="table-wrap" *ngIf="ticketStats.length > 0">
+      <div class="table-wrap" *ngIf="filteredTicketStats().length > 0">
         <table class="table">
           <thead>
             <tr>
@@ -149,20 +238,20 @@
             </tr>
           </thead>
           <tbody>
-            <ng-container *ngFor="let u of ticketStats">
+            <ng-container *ngFor="let u of filteredTicketStats()">
               <tr class="clickable-row" (click)="toggleUser(u.userName)">
                 <td class="user-cell">{{ u.userName }}</td>
-                <td class="ok">{{ u.totalTickets }}</td>
+                <td class="ok">{{ u.tickets.length }}</td>
                 <td class="expand-cell">{{ isUserExpanded(u.userName) ? '&#9660;' : '&#9654;' }}</td>
               </tr>
               <tr *ngIf="isUserExpanded(u.userName)" class="detail-row">
                 <td colspan="3">
                   <div class="ticket-detail-list">
-                    <div class="ticket-detail-item" *ngFor="let t of u.tickets">
+                    <div class="ticket-detail-item" *ngFor="let t of visibleTickets(u)">
                       <span class="ticket-num">{{ t.ticketNumber }}</span>
                       <span class="ticket-datetime" *ngIf="t.createdDateTime">{{ formatDateTime(t.createdDateTime) }}</span>
                       <span class="ticket-datetime" *ngIf="t.resolutionDateTime">{{ formatDateTime(t.resolutionDateTime) }}</span>
-                      <span class="ticket-source muted">{{ t.source }}</span>
+                      <span class="ticket-source muted">{{ t.label }}</span>
                     </div>
                   </div>
                 </td>
@@ -171,7 +260,135 @@
           </tbody>
         </table>
       </div>
-      <div *ngIf="ticketStats.length === 0 && ticketAlerts.length === 0" class="empty-cell">Aucun ticket r&eacute;solu cette semaine pour l'&eacute;quipe {{ ticketTeam }}.</div>
+      <div *ngIf="!ticketLoading && filteredTicketStats().length === 0 && ticketAlerts.length === 0" class="empty-cell">Aucun ticket r&eacute;solu ce mois pour l'&eacute;quipe {{ ticketTeam }}.</div>
     </div>
   </div>
+
+    <!-- Plaintes -->
+    <div *ngIf="activeTab === 'plaintes'">
+      <div class="team-selector">
+        <button class="tab small-tab" [class.active]="plainteFilter === 'ALL'" (click)="setPlaintesFilter('ALL')">Tous les fichiers</button>
+        <button *ngFor="let f of plainteOverview?.files ?? []" class="tab small-tab"
+                [class.active]="plainteFilter === f.name" (click)="setPlaintesFilter(f.name)">{{ f.label }}</button>
+        <button class="tab small-tab upload-toggle" (click)="plainteUploadOpen = !plainteUploadOpen">
+          {{ plainteUploadOpen ? 'Fermer' : 'T&eacute;l&eacute;verser des fichiers' }}
+        </button>
+      </div>
+
+      <div *ngIf="plainteUploadOpen" class="upload-panel">
+        <div class="upload-field">
+          <label class="upload-label">Fichiers Plaintes .xlsx (plusieurs mois possibles)</label>
+          <input type="file" accept=".xlsx" multiple class="field file-input" (change)="onPlaintesFileSelected($event)" />
+          <p class="muted small">Nommez le fichier &laquo;&nbsp;Plaintes &lt;Mois&gt; &lt;Ann&eacute;e&gt;.xlsx&nbsp;&raquo; (ex. Plaintes Juillet 2026.xlsx). Un mois par fichier.</p>
+        </div>
+        <div *ngIf="plainteSelectedFiles.length" class="selected-file">
+          <div class="upload-field">
+            <strong>Fichiers s&eacute;lectionn&eacute;s ({{ plainteSelectedFiles.length }}) :</strong>
+            <span *ngFor="let f of plainteSelectedFiles" class="upload-name">{{ f.name }}</span>
+          </div>
+        </div>
+        <div *ngIf="plainteUploadErr" class="alert alert-error">{{ plainteUploadErr }}</div>
+        <div *ngIf="plainteUploadMsg" class="alert alert-success">{{ plainteUploadMsg }}</div>
+        <button class="btn btn-primary" (click)="uploadPlaintesFiles()" [disabled]="plainteUploading || plainteSelectedFiles.length === 0">
+          {{ plainteUploading ? 'T&eacute;l&eacute;versement...' : 'T&eacute;l&eacute;verser' }}
+        </button>
+      </div>
+
+      <div *ngIf="plainteLoading" class="spinner"></div>
+
+      <!-- Search plaintes -->
+      <div class="booking-panel search-panel">
+        <h3 class="alerts-title">Rechercher une plainte</h3>
+        <div class="booking-row">
+          <input type="text" class="field select" placeholder="Raison sociale ou N° ticket (ex. CMC COCA_COLA_COMPANY)"
+                 [(ngModel)]="plainteSearchQ" (keyup.enter)="searchPlaintes()" />
+          <button class="btn btn-primary" (click)="searchPlaintes()"
+                  [disabled]="plainteSearching || !plainteSearchQ.trim()">
+            {{ plainteSearching ? 'Recherche...' : 'Rechercher' }}
+          </button>
+          <button class="btn-ghost small" *ngIf="plainteSearchResults.length" (click)="quitPlaintesSearch()">Effacer</button>
+        </div>
+        <p class="muted small">Recherche par raison sociale (client) ou N° ticket, sur le fichier s&eacute;lectionn&eacute;.</p>
+      </div>
+
+      <div *ngIf="plainteSearching" class="spinner"></div>
+
+      <div *ngIf="!plainteSearching && plainteSearchQ.trim() && plainteSearchResults.length === 0" class="empty-cell">
+        Aucune plainte trouvée pour &laquo;&nbsp;{{ plainteSearchQ }}&nbsp;&raquo;.
+      </div>
+
+      <div *ngIf="plainteSearchResults.length" class="table-wrap search-results">
+        <table class="table small-table">
+          <thead>
+            <tr>
+              <th>N° ticket</th>
+              <th>Raison sociale</th>
+              <th>Date ouverture</th>
+              <th>Statut</th>
+              <th>Produit</th>
+              <th>Service</th>
+              <th>Priorit&eacute;</th>
+              <th>Etat</th>
+              <th>R&eacute;par&eacute; par</th>
+              <th>Responsabilit&eacute;</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let r of plainteSearchResults">
+              <td class="ticket-num">{{ r.ticketNumber }}</td>
+              <td class="user-cell">{{ r.raisonSociale }}</td>
+              <td class="muted">{{ r.dateOuverture ? formatDate(r.dateOuverture) : '' }}</td>
+              <td>{{ r.statut }}</td>
+              <td class="muted">{{ r.produit }}</td>
+              <td class="muted">{{ r.service }}</td>
+              <td>{{ r.priorite }}</td>
+              <td>{{ r.etat }}</td>
+              <td class="muted">{{ r.reparePar }}</td>
+              <td class="muted">{{ r.responsabilite }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!plainteLoading && plainteOverview && (plainteOverview.recurrent ?? []).length" class="recurrent-alerts">
+        <h3 class="alerts-title">Alerte &mdash; clients r&eacute;currents (2+ plaintes dans les 2 derniers mois)</h3>
+        <table class="table small-table recurrent-table">
+          <tbody>
+            <tr *ngFor="let r of plainteOverview.recurrent">
+              <td class="user-cell">
+                <span class="badge badge-warn">R&eacute;current</span>
+                {{ r.raisonSociale }}
+              </td>
+              <td class="ok">{{ r.count }} plaintes</td>
+              <td class="muted">du {{ r.firstDate }}</td>
+              <td class="muted">au {{ r.lastDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div *ngIf="!plainteLoading && plainteOverview" class="pie-grid">
+        <div class="chart-card" *ngFor="let dim of plainteDims">
+          <h3 class="alerts-title">{{ dim.title }}</h3>
+          <div [ngClass]="dim.kind === 'bar' ? 'chart-box tall' : 'chart-box pie'" *ngIf="plainteCharts[dim.key]">
+            <canvas *ngIf="dim.kind === 'bar'" baseChart type="bar" [data]="plainteCharts[dim.key]" [options]="plainteBarOptions"></canvas>
+            <canvas *ngIf="dim.kind === 'pie'" baseChart type="pie" [data]="plainteCharts[dim.key]" [options]="plaintePieOptions"></canvas>
+          </div>
+          <table class="table small-table" *ngIf="plainteSlices(dim.key).length">
+            <tbody>
+              <tr *ngFor="let s of plainteSlices(dim.key); let i = index">
+                <td class="user-cell">
+                  <span class="pie-dot" [style.background]="plainteColor(dim.key, i)"></span>
+                  {{ s.label.length > 28 ? (s.label | slice:0:27) + '…' : s.label }}
+                </td>
+                <td class="ok">{{ s.count }}</td>
+                <td class="muted">{{ plaintePct(dim.key, s.count) }}</td>
+              </tr>
+            </tbody>
+          </table>
+          <div *ngIf="!plainteSlices(dim.key).length" class="empty-cell">Aucune donn&eacute;e pour ce fichier.</div>
+        </div>
+      </div>
+    </div>
+
 </ng-container>

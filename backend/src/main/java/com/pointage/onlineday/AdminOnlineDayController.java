@@ -1,10 +1,8 @@
 package com.pointage.onlineday;
 
 import org.springframework.format.annotation.DateTimeFormat;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -23,5 +21,20 @@ public class AdminOnlineDayController {
     public List<OnlineDayAdminDto> getAllOnlineDays(
             @RequestParam(required = false) @DateTimeFormat(iso = DateTimeFormat.ISO.DATE) LocalDate start) {
         return onlineDayService.getAllOnlineDays(start);
+    }
+
+    @PostMapping("/online-days")
+    public ResponseEntity<OnlineDayDto> adminBook(
+            @RequestParam Long userId,
+            @RequestBody OnlineDayRequest request) {
+        return ResponseEntity.ok(onlineDayService.adminBookDay(userId, request.dayDate()));
+    }
+
+    @DeleteMapping("/online-days/{id}")
+    public ResponseEntity<Void> adminCancel(
+            @RequestParam Long userId,
+            @PathVariable Long id) {
+        onlineDayService.adminCancelDay(userId, id);
+        return ResponseEntity.noContent().build();
     }
 }
